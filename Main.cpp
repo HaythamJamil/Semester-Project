@@ -18,9 +18,43 @@ vector<string> listFiles(string path)
     closedir(dir);
     return files;
 }
+string enterFolder(string folderName, string currentPath)
+{
+    currentPath = currentPath + "\\" + folderName;
+    return currentPath;
+}
+string goBack(string currentPath)
+{
+    char lastDoubleSlash = '\\';
+    size_t position;
+    position = currentPath.find_last_of(lastDoubleSlash);
+    currentPath.substr(0, position);
+    currentPath = currentPath.substr(0, position);
+    return currentPath;
+}
 int main()
 {
     vector<string> result = listFiles("C:\\Users\\Haytham\\Desktop");
+    for (int i = 0; i < result.size(); i++)
+    {
+        cout << result[i] << endl;
+    }
+    string currentPath = "C:\\Users\\Haytham\\Desktop";
+    string folderName = "CourseWork";
+    currentPath = enterFolder(folderName, currentPath);
+    result = listFiles(currentPath);
+    for (int i = 0; i < result.size(); i++)
+    {
+        cout << result[i] << endl;
+    }
+    currentPath = goBack(currentPath);
+    result = listFiles(currentPath);
+    for (int i = 0; i < result.size(); i++)
+    {
+        cout << result[i] << endl;
+    }
+    currentPath = goBack(currentPath);
+    result = listFiles(currentPath);
     for (int i = 0; i < result.size(); i++)
     {
         cout << result[i] << endl;
