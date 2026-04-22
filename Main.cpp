@@ -32,6 +32,13 @@ string goBack(string currentPath)
     currentPath = currentPath.substr(0, position);
     return currentPath;
 }
+bool isFolder(string currentPath, string folderName)
+{
+    currentPath = currentPath + "\\" + folderName;
+    struct stat info;
+    stat(currentPath.c_str(), &info);
+    return S_ISDIR(info.st_mode);
+}
 int main()
 {
     vector<string> result = listFiles("C:\\Users\\Haytham\\Desktop");
@@ -40,23 +47,6 @@ int main()
         cout << result[i] << endl;
     }
     string currentPath = "C:\\Users\\Haytham\\Desktop";
-    string folderName = "CourseWork";
-    currentPath = enterFolder(folderName, currentPath);
-    result = listFiles(currentPath);
-    for (int i = 0; i < result.size(); i++)
-    {
-        cout << result[i] << endl;
-    }
-    currentPath = goBack(currentPath);
-    result = listFiles(currentPath);
-    for (int i = 0; i < result.size(); i++)
-    {
-        cout << result[i] << endl;
-    }
-    currentPath = goBack(currentPath);
-    result = listFiles(currentPath);
-    for (int i = 0; i < result.size(); i++)
-    {
-        cout << result[i] << endl;
-    }
+    string folderName = "Kindle Create.lnk";
+    cout << isFolder(currentPath, folderName) << endl;
 }
