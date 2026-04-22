@@ -13,7 +13,14 @@ vector<string> listFiles(string path)
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL)
     {
-        files.push_back(string(entry->d_name));
+        if (string(entry->d_name) == "." || string(entry->d_name) == "..")
+        {
+            // does nothing
+        }
+        else
+        {
+            files.push_back(string(entry->d_name));
+        }
     }
     closedir(dir);
     return files;
@@ -39,6 +46,13 @@ bool isFolder(string currentPath, string folderName)
     stat(currentPath.c_str(), &info);
     return S_ISDIR(info.st_mode);
 }
+long fileSize(string currentPath, string folderName)
+{
+    currentPath = currentPath + "\\" + folderName;
+    struct stat info;
+    stat(currentPath.c_str(), &info);
+    return info.st_size;
+}
 int main()
 {
     vector<string> result = listFiles("C:\\Users\\Haytham\\Desktop");
@@ -49,4 +63,5 @@ int main()
     string currentPath = "C:\\Users\\Haytham\\Desktop";
     string folderName = "Kindle Create.lnk";
     cout << isFolder(currentPath, folderName) << endl;
+    cout << fileSize(currentPath, "desktop.ini") << endl;
 }
