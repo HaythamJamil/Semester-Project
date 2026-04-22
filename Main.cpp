@@ -73,13 +73,25 @@ bool deleteFile(string currentPath, string fileName)
     string fullPath = currentPath + "\\" + fileName;
     if (isFolder(currentPath, fileName))
     {
+        vector<string> result = listFiles(fullPath);
+        for (int i = 0; i < result.size(); i++)
+        {
+            if (isFolder(fullPath, result[i]))
+            {
+                deleteFile(fullPath, result[i]);
+            }
+            else
+            {
+                deleteFile(fullPath, result[i]);
+            }
+        }
         rmdir(fullPath.c_str());
     }
     else
     {
         remove(fullPath.c_str());
     }
-    return rmdir(fullPath.c_str()) == 0;
+    return true;
 }
 int main()
 {
@@ -94,5 +106,5 @@ int main()
     cout << fileSize(currentPath, "desktop.ini") << endl;
     cout << fileType("desktop.ini") << endl;
     createFolder(currentPath, "I made this in VSCode");
-    deleteFile(currentPath, "I made this in VSCode");
+    deleteFile(currentPath, "New folder");
 }
