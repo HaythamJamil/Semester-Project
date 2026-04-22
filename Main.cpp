@@ -5,6 +5,7 @@
 #include <vector>
 #include <sstream>
 #include <sys/stat.h>
+#include <cstdio>
 using namespace std;
 vector<string> listFiles(string path)
 {
@@ -53,6 +54,33 @@ long fileSize(string currentPath, string folderName)
     stat(currentPath.c_str(), &info);
     return info.st_size;
 }
+string fileType(string fileName)
+{
+    string type;
+    char extensionDot = '.';
+    size_t position;
+    position = fileName.find_last_of(extensionDot);
+    fileName = fileName.substr(position);
+    return fileName;
+}
+bool createFolder(string currentPath, string folderName)
+{
+    string newPath = currentPath + "\\" + folderName;
+    return mkdir(newPath.c_str()) == 0;
+}
+bool deleteFile(string currentPath, string fileName)
+{
+    string fullPath = currentPath + "\\" + fileName;
+    if (isFolder(currentPath, fileName))
+    {
+        rmdir(fullPath.c_str());
+    }
+    else
+    {
+        remove(fullPath.c_str());
+    }
+    return rmdir(fullPath.c_str()) == 0;
+}
 int main()
 {
     vector<string> result = listFiles("C:\\Users\\Haytham\\Desktop");
@@ -64,4 +92,7 @@ int main()
     string folderName = "Kindle Create.lnk";
     cout << isFolder(currentPath, folderName) << endl;
     cout << fileSize(currentPath, "desktop.ini") << endl;
+    cout << fileType("desktop.ini") << endl;
+    createFolder(currentPath, "I made this in VSCode");
+    deleteFile(currentPath, "I made this in VSCode");
 }
