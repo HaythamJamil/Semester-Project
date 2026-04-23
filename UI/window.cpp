@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-    const string startPath = "Desktop"; // change this to your desired starting directory
+    const string startPath = "Desktop";
     vector<string> files = listFiles(startPath);
 
     InitWindow(800, 600, "File Explorer");

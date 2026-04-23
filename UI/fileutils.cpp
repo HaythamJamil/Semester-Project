@@ -77,7 +77,7 @@ vector<string> listFiles(const string &path)
 
     DIR *dir = opendir(path.c_str());
     if (dir == nullptr)
-        return files; // return empty if path is invalid
+        return files;
 
     struct dirent *entry;
     while ((entry = readdir(dir)) != nullptr)
