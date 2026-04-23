@@ -36,7 +36,6 @@ string goBack(string currentPath)
     char lastDoubleSlash = '\\';
     size_t position;
     position = currentPath.find_last_of(lastDoubleSlash);
-    currentPath.substr(0, position);
     currentPath = currentPath.substr(0, position);
     return currentPath;
 }
