@@ -1,2 +1,2 @@
-g++ -std=c++17 window.cpp fileutils.cpp -o FileExplorer.exe -I"C:/raylib-6.0_win64_mingw-w64/raylib-6.0_win64_mingw-w64/include" -L"C:/raylib-6.0_win64_mingw-w64/raylib-6.0_win64_mingw-w64/lib" -lraylib -lopengl32 -lgdi32 -lwinmm
+g++ -std=c++17 window.cpp fileutils.cpp -o FileExplorer.exe -I"C:/raylib-6.0_win64_mingw-w64/raylib-6.0_win64_mingw-w64/include" -L"C:/raylib-6.0_win64_mingw-w64/raylib-6.0_win64_mingw-w64/lib" -lraylib -lopengl32 -lgdi32 -lwinmm -lshell32
 FileExplorer.exe

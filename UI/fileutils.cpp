@@ -1,8 +1,11 @@
-#include "fileutils.h"
 #include <sys/stat.h>
 #include <cstdio>
 #include <direct.h>
 #include <dirent.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <shellapi.h>
+#include "fileutils.h"
 using namespace std;
 
 string enterFolder(string folderName, string currentPath)
@@ -91,4 +94,9 @@ vector<string> listFiles(const string &path)
 
     closedir(dir);
     return files;
+}
+void openFile(string fileName, string currentPath)
+{
+    currentPath = currentPath + "\\" + fileName;
+    ShellExecute(0, TEXT("open"), currentPath.c_str(), 0, 0, SW_SHOW);
 }

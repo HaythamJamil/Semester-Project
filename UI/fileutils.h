@@ -12,3 +12,4 @@ long fileSize(string currentPath, string folderName);
 string fileType(string fileName);
 bool createFolder(string currentPath, string folderName);
 bool deleteFile(string currentPath, string fileName);
+void openFile(string fileName, string currentPath);
