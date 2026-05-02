@@ -7,7 +7,11 @@ using namespace std;
 
 int main()
 {
+
     string currentPath = "Desktop";
+
+    string currentPath = "C:\\Users\\Haytham\\Desktop";
+
     vector<string> files = listFiles(currentPath);
 
     InitWindow(800, 600, "File Explorer");
@@ -34,6 +38,7 @@ int main()
         // scroll
         int wheel = GetMouseWheelMove();
         scrollY -= wheel * rowHeight;
+
         if (scrollY < 0) scrollY = 0;
         int maxScroll = (int)files.size() * rowHeight - (600 - listStartY);
         if (maxScroll < 0) maxScroll = 0;
@@ -90,13 +95,56 @@ int main()
             }
         }
 
+        if (scrollY < 0)
+            scrollY = 0;
+        int maxScroll = (int)files.size() * rowHeight - (600 - listStartY);
+        if (maxScroll < 0)
+            maxScroll = 0;
+        if (scrollY > maxScroll)
+            scrollY = maxScroll;
+
+
+        // mouse click
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        {
+            int mouseX = GetMouseX();
+            int mouseY = GetMouseY();
+
+            for (int i = 0; i < (int)files.size(); i++)
+            {
+                int y = listStartY + i * rowHeight - scrollY;
+
+                // check if click is within this row
+                if (mouseY >= y && mouseY < y + rowHeight && mouseX < 800)
+                {
+                    if (isFolder(currentPath, files[i]))
+                    {
+                        currentPath = enterFolder(files[i], currentPath);
+                        files = listFiles(currentPath);
+                        scrollY = 0;
+                    }
+                    else
+                    {
+                        openFile(files[i], currentPath);
+                    }
+                    break;
+                }
+            }
+        }
+
         // --- DRAW ---
         BeginDrawing();
         ClearBackground(BLACK);
 
+
         // current path
         DrawText(currentPath.c_str(), 10, 10, 16, RED);
         DrawLine(0, 35, 800, 35, WHITE);
+
+        // show current path at top
+        DrawText(currentPath.c_str(), 10, 10, 16, RED);
+        DrawLine(0, 35, 800, 35, LIGHTGRAY);
+
 
         // back button
         DrawRectangle(btnX, btnY, btnW, btnH, ORANGE);
@@ -106,6 +154,7 @@ int main()
         for (int i = 0; i < (int)files.size(); i++)
         {
             int y = listStartY + i * rowHeight - scrollY;
+
             if (y < listStartY || y > 600) continue;
 
             if (i == selectedIndex)
@@ -118,6 +167,12 @@ int main()
             {
                 DrawText(files[i].c_str(), 20, y, 18, GREEN);
             }
+
+            if (y < listStartY || y > 600)
+                continue;
+
+            DrawText(files[i].c_str(), 20, y, 18, GREEN);
+
         }
 
         EndDrawing();
