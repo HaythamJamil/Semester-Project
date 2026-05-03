@@ -123,3 +123,9 @@ string sizeSorter(long bytes)
         return to_string(bytes / 1073741824) + " GB";
     }
 }
+bool renameFile(string currentPath, string oldName, string newName)
+{
+    string oldPath = currentPath + "\\" + oldName;
+    string newPath = currentPath + "\\" + newName;
+    return rename(oldPath.c_str(), newPath.c_str()) == 0;
+}

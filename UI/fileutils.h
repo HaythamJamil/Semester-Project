@@ -14,3 +14,4 @@ bool createFolder(string currentPath, string folderName);
 bool deleteFile(string currentPath, string fileName);
 void openFile(string fileName, string currentPath);
 string sizeSorter(long bytes);
+bool renameFile(string currentPath, string oldName, string newName);

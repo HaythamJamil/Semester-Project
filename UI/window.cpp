@@ -19,14 +19,19 @@ int main()
     const int rowHeight = 25;
     const int listStartY = 45;
 
-    // back button position and size
-    const int btnX = 950;
-    const int delbtnX = 890;
+    const int btnX = 950;    // back button position and size
+    const int delbtnX = 890; // this is for delete button
+    const int crtbtnX = 830; // this is for the create folder button
+    const int renbtnX = 770; // this is for the rename button
     const int btnY = 0;
     const int btnW = 50;
     const int btnH = 34;
 
-    bool showConfirm = false;
+    bool delConfirm = false;
+    bool crtConfirm = false;
+    bool renConfirm = false;
+
+    string newName = "";
 
     int selectedIndex = 0;      // first item highlighted by default
     double lastClickTime = 0.0; // time of last click
@@ -48,6 +53,44 @@ int main()
         if (scrollY > maxScroll)
             scrollY = maxScroll;
 
+        if (crtConfirm)
+        {
+            int key = GetCharPressed();
+            if (key > 0)
+            {
+                newName += (char)key;
+            }
+            if (IsKeyPressed(KEY_BACKSPACE) && newName.size() > 0)
+            {
+                newName.pop_back();
+            }
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                createFolder(currentPath, newName);
+                files = listFiles(currentPath);
+                newName = "";
+                crtConfirm = false;
+            }
+        }
+        if (renConfirm)
+        {
+            int key = GetCharPressed();
+            if (key > 0)
+            {
+                newName += (char)key;
+            }
+            if (IsKeyPressed(KEY_BACKSPACE) && newName.size() > 0)
+            {
+                newName.pop_back();
+            }
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                renameFile(currentPath, files[selectedIndex], newName);
+                files = listFiles(currentPath);
+                newName = "";
+                renConfirm = false;
+            }
+        }
         // mouse click
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         {
@@ -67,8 +110,29 @@ int main()
             else if (mouseX >= delbtnX && mouseX <= delbtnX + btnW &&
                      mouseY >= btnY && mouseY <= btnY + btnH)
             {
-                showConfirm = true;
+                delConfirm = true;
             }
+            else if (mouseX >= 320 && mouseX <= 360 && mouseY >= 310 && mouseY <= 330)
+            {
+                deleteFile(currentPath, files[selectedIndex]);
+                files = listFiles(currentPath);
+                delConfirm = false;
+            }
+            else if (mouseX >= 520 && mouseX <= 560 && mouseY >= 310 && mouseY <= 330)
+            {
+                delConfirm = false;
+            }
+            else if (mouseX >= crtbtnX && mouseX <= crtbtnX + btnW &&
+                     mouseY >= btnY && mouseY <= btnY + btnH)
+            {
+                crtConfirm = true;
+            }
+            else if (mouseX >= renbtnX && mouseX <= renbtnX + btnW &&
+                     mouseY >= btnY && mouseY <= btnY + btnH)
+            {
+                renConfirm = true;
+            }
+
             else
             {
                 // check file row click
@@ -117,24 +181,27 @@ int main()
 
         // current path
         DrawText(currentPath.c_str(), 10, 10, 16, RED);
-        DrawLine(0, 35, 800, 35, LIGHTGRAY);
+        DrawLine(0, 35, 500, 35, LIGHTGRAY);
 
         // back button
         DrawRectangle(btnX, btnY, btnW, btnH, ORANGE);
         DrawText("<-", btnX + 10, btnY + 5, 32, WHITE);
         DrawRectangle(delbtnX, btnY, btnW + 5, btnH, RED);
         DrawText("DEL", delbtnX + 2, btnY + 5, 28, WHITE);
+        DrawRectangle(crtbtnX, btnY, btnW + 5, btnH, ORANGE);
+        DrawText("CRT", crtbtnX + 3, btnY + 5, 28, WHITE);
+        DrawRectangle(renbtnX, btnY, btnW + 5, btnH, LIME);
+        DrawText("REN", renbtnX + 3, btnY + 5, 28, WHITE);
 
-        // file list
+        // ONE loop only
         for (int i = 0; i < (int)files.size(); i++)
         {
-
+            int y = listStartY + i * rowHeight - scrollY;
             if (y < listStartY || y > 600)
                 continue;
 
             if (i == selectedIndex)
             {
-                // highlighted row — draw border rectangle
                 DrawRectangleLines(10, y - 2, 980, rowHeight, ORANGE);
                 DrawText(files[i].c_str(), 20, y, 18, ORANGE);
                 string size = sizeSorter(fileSize(currentPath, files[i]));
@@ -147,13 +214,27 @@ int main()
                 DrawText(files[i].c_str(), 20, y, 18, GREEN);
             }
         }
-        int y = listStartY + i * rowHeight - scrollY;
-        if (showConfirm && i == selectedIndex)
+
+        if (delConfirm)
         {
             DrawRectangle(250, 200, 400, 150, DARKGRAY);
             DrawText("Are you sure you want to delete?", 270, 230, 18, WHITE);
             DrawText("YES", 320, 310, 20, RED);
             DrawText("NO", 520, 310, 20, GREEN);
+        }
+        if (crtConfirm)
+        {
+            DrawRectangle(250, 200, 400, 150, DARKGRAY);
+            DrawText("Name your New Folder:", 270, 230, 18, WHITE);
+            DrawText(newName.c_str(), 270, 270, 18, GREEN);
+            DrawText("Press ENTER to confirm", 270, 310, 16, GRAY);
+        }
+        if (renConfirm)
+        {
+            DrawRectangle(250, 200, 400, 150, DARKGRAY);
+            DrawText("Rename your Item:", 270, 230, 18, WHITE);
+            DrawText(newName.c_str(), 270, 270, 18, GREEN);
+            DrawText("Press ENTER to confirm", 270, 310, 16, GRAY);
         }
 
         EndDrawing();
