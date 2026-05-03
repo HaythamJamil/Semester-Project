@@ -7,15 +7,30 @@ using namespace std;
 
 int main()
 {
-    string currentPath = "C:\\Users\\Haytham\\Desktop";
+
+    string currentPath = "C:\\Users\\Haytham\\Desktop\\A";
+
     vector<string> files = listFiles(currentPath);
 
-    InitWindow(800, 600, "File Explorer");
+    InitWindow(1000, 600, "File Explorer");
     SetTargetFPS(60);
 
     int scrollY = 0;
     const int rowHeight = 25;
     const int listStartY = 45;
+
+    // back button position and size
+    const int btnX = 950;
+    const int delbtnX = 890;
+    const int btnY = 0;
+    const int btnW = 50;
+    const int btnH = 34;
+
+    bool showConfirm = false;
+
+    int selectedIndex = 0;      // first item highlighted by default
+    double lastClickTime = 0.0; // time of last click
+    int lastClickedIndex = -1;  // which index was last clicked
 
     while (!WindowShouldClose())
     {
@@ -24,6 +39,7 @@ int main()
         // scroll
         int wheel = GetMouseWheelMove();
         scrollY -= wheel * rowHeight;
+
         if (scrollY < 0)
             scrollY = 0;
         int maxScroll = (int)files.size() * rowHeight - (600 - listStartY);
@@ -38,24 +54,59 @@ int main()
             int mouseX = GetMouseX();
             int mouseY = GetMouseY();
 
-            for (int i = 0; i < (int)files.size(); i++)
+            // check back button click
+            if (mouseX >= btnX && mouseX <= btnX + btnW &&
+                mouseY >= btnY && mouseY <= btnY + btnH)
             {
-                int y = listStartY + i * rowHeight - scrollY;
-
-                // check if click is within this row
-                if (mouseY >= y && mouseY < y + rowHeight && mouseX < 800)
+                currentPath = goBack(currentPath);
+                files = listFiles(currentPath);
+                scrollY = 0;
+                selectedIndex = 0;
+                lastClickedIndex = -1;
+            }
+            else if (mouseX >= delbtnX && mouseX <= delbtnX + btnW &&
+                     mouseY >= btnY && mouseY <= btnY + btnH)
+            {
+                showConfirm = true;
+            }
+            else
+            {
+                // check file row click
+                for (int i = 0; i < (int)files.size(); i++)
                 {
-                    if (isFolder(currentPath, files[i]))
+                    int y = listStartY + i * rowHeight - scrollY;
+
+                    if (mouseY >= y && mouseY < y + rowHeight && mouseX < 800)
                     {
-                        currentPath = enterFolder(files[i], currentPath);
-                        files = listFiles(currentPath);
-                        scrollY = 0;
+                        double now = GetTime();
+                        double timeSinceLastClick = now - lastClickTime;
+
+                        if (lastClickedIndex == i && timeSinceLastClick < 0.4)
+                        {
+                            // double click — enter folder or open file
+                            if (isFolder(currentPath, files[i]))
+                            {
+                                currentPath = enterFolder(files[i], currentPath);
+                                files = listFiles(currentPath);
+                                scrollY = 0;
+                                selectedIndex = 0;
+                                lastClickedIndex = -1;
+                            }
+                            else
+                            {
+                                openFile(files[i], currentPath);
+                            }
+                        }
+                        else
+                        {
+                            // single click — just highlight
+                            selectedIndex = i;
+                            lastClickedIndex = i;
+                            lastClickTime = now;
+                        }
+
+                        break;
                     }
-                    else
-                    {
-                        openFile(files[i], currentPath);
-                    }
-                    break;
                 }
             }
         }
@@ -64,17 +115,45 @@ int main()
         BeginDrawing();
         ClearBackground(BLACK);
 
-        // show current path at top
+        // current path
         DrawText(currentPath.c_str(), 10, 10, 16, RED);
         DrawLine(0, 35, 800, 35, LIGHTGRAY);
 
+        // back button
+        DrawRectangle(btnX, btnY, btnW, btnH, ORANGE);
+        DrawText("<-", btnX + 10, btnY + 5, 32, WHITE);
+        DrawRectangle(delbtnX, btnY, btnW + 5, btnH, RED);
+        DrawText("DEL", delbtnX + 2, btnY + 5, 28, WHITE);
+
+        // file list
         for (int i = 0; i < (int)files.size(); i++)
         {
-            int y = listStartY + i * rowHeight - scrollY;
+
             if (y < listStartY || y > 600)
                 continue;
 
-            DrawText(files[i].c_str(), 20, y, 18, GREEN);
+            if (i == selectedIndex)
+            {
+                // highlighted row — draw border rectangle
+                DrawRectangleLines(10, y - 2, 980, rowHeight, ORANGE);
+                DrawText(files[i].c_str(), 20, y, 18, ORANGE);
+                string size = sizeSorter(fileSize(currentPath, files[i]));
+                DrawText(size.c_str(), 900, y, 18, RED);
+                string type = fileType(files[i]);
+                DrawText(type.c_str(), 775, y, 18, YELLOW);
+            }
+            else
+            {
+                DrawText(files[i].c_str(), 20, y, 18, GREEN);
+            }
+        }
+        int y = listStartY + i * rowHeight - scrollY;
+        if (showConfirm && i == selectedIndex)
+        {
+            DrawRectangle(250, 200, 400, 150, DARKGRAY);
+            DrawText("Are you sure you want to delete?", 270, 230, 18, WHITE);
+            DrawText("YES", 320, 310, 20, RED);
+            DrawText("NO", 520, 310, 20, GREEN);
         }
 
         EndDrawing();
