@@ -13,3 +13,4 @@ string fileType(string fileName);
 bool createFolder(string currentPath, string folderName);
 bool deleteFile(string currentPath, string fileName);
 void openFile(string fileName, string currentPath);
+string sizeSorter(long bytes);

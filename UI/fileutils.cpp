@@ -41,6 +41,10 @@ string fileType(string fileName)
     char extensionDot = '.';
     size_t position;
     position = fileName.find_last_of(extensionDot);
+    if (position == string::npos)
+    {
+        return "Folder";
+    }
     fileName = fileName.substr(position);
     return fileName;
 }
@@ -99,4 +103,23 @@ void openFile(string fileName, string currentPath)
 {
     currentPath = currentPath + "\\" + fileName;
     ShellExecute(0, TEXT("open"), currentPath.c_str(), 0, 0, SW_SHOW);
+}
+string sizeSorter(long bytes)
+{
+    if (bytes < 1024)
+    {
+        return to_string(bytes) + " B";
+    }
+    else if (bytes < 1048576)
+    {
+        return to_string(bytes / 1024) + " kB";
+    }
+    else if (bytes < 1073741824)
+    {
+        return to_string(bytes / 1048576) + " MB";
+    }
+    else if (bytes < 1099511627776)
+    {
+        return to_string(bytes / 1073741824) + " GB";
+    }
 }
