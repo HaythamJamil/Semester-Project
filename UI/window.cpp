@@ -15,6 +15,9 @@ int main()
 
     InitWindow(1000, 600, "File Explorer");
     SetWindowState(FLAG_WINDOW_RESIZABLE);
+    Image icon = LoadImage("ExplorerIcon.png");
+    SetWindowIcon(icon);
+    UnloadImage(icon);
     SetTargetFPS(60);
 
     int scrollY = 0;
