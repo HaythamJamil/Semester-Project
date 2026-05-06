@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "fileutils.h"
+#include "darkmode.h"
 #include <string>
 #include <vector>
 
@@ -14,6 +15,7 @@ int main()
     vector<string> files = listFiles(currentPath);
 
     InitWindow(1000, 600, "File Explorer");
+    enableDarkMode((void*)GetWindowHandle());
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     Image icon = LoadImage("ExplorerIcon.png");
     SetWindowIcon(icon);
