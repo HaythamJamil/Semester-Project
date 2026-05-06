@@ -104,6 +104,31 @@ void openFile(string fileName, string currentPath)
     currentPath = currentPath + "\\" + fileName;
     ShellExecute(0, TEXT("open"), currentPath.c_str(), 0, 0, SW_SHOW);
 }
+
+string sizeSorter(long long bytes)
+{
+    if (bytes < 1024)
+    {
+        return to_string(bytes) + " B";
+    }
+    else if (bytes < 1048576)
+    {
+        return to_string(bytes / 1024) + " kB";
+    }
+    else if (bytes < 1073741824)
+    {
+        return to_string(bytes / 1048576) + " MB";
+    }
+    else if (bytes < 1099511627776)
+    {
+        return to_string(bytes / 1073741824) + " GB";
+    }
+    else
+    {
+        return to_string(bytes / 1099511627776) + " TB";
+    }
+}
+
 string sizeSorter(long bytes)
 {
     if (bytes < 1024)
@@ -128,4 +153,16 @@ bool renameFile(string currentPath, string oldName, string newName)
     string oldPath = currentPath + "\\" + oldName;
     string newPath = currentPath + "\\" + newName;
     return rename(oldPath.c_str(), newPath.c_str()) == 0;
+}
+long long getDriveTotal(string drive)
+{
+    ULARGE_INTEGER freeBytes, totalBytes, totalFreeBytes;
+    GetDiskFreeSpaceEx(drive.c_str(), &freeBytes, &totalBytes, &totalFreeBytes);
+    return totalBytes.QuadPart;
+}
+long long getDriveFree(string drive)
+{
+    ULARGE_INTEGER freeBytes, totalBytes, totalFreeBytes;
+    GetDiskFreeSpaceEx(drive.c_str(), &freeBytes, &totalBytes, &totalFreeBytes);
+    return freeBytes.QuadPart;
 }

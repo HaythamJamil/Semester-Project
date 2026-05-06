@@ -13,5 +13,8 @@ string fileType(string fileName);
 bool createFolder(string currentPath, string folderName);
 bool deleteFile(string currentPath, string fileName);
 void openFile(string fileName, string currentPath);
+string sizeSorter(long long bytes);
 string sizeSorter(long bytes);
 bool renameFile(string currentPath, string oldName, string newName);
+long long getDriveFree(string drive);
+long long getDriveTotal(string drive);
