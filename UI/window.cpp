@@ -14,19 +14,12 @@ int main()
     vector<string> files = listFiles(currentPath);
 
     InitWindow(1000, 600, "File Explorer");
+    SetWindowState(FLAG_WINDOW_RESIZABLE);
     SetTargetFPS(60);
 
     int scrollY = 0;
     const int rowHeight = 25;
     const int listStartY = 45;
-
-    const int btnX = 950;    // back button position and size
-    const int delbtnX = 880; // this is for delete button
-    const int crtbtnX = 810; // this is for the create folder button
-    const int renbtnX = 740; // this is for the rename button
-    const int btnY = 0;
-    const int btnW = 28;
-    const int btnH = 34;
 
     bool delConfirm = false;
     bool crtConfirm = false;
@@ -39,9 +32,9 @@ int main()
     int lastClickedIndex = -1;  // which index was last clicked
 
     // Matrix Rain Effect variables, this is only for aesthetics
-    const int COLS = 1000 / 10; // one column every 10px
-    int rainY[COLS];            // current Y of each column head
-    int rainSpeed[COLS];        // speed of each column
+    const int COLS = 200; // one column every 10px
+    int rainY[COLS];      // current Y of each column head
+    int rainSpeed[COLS];  // speed of each column
     // loop for the same effect to get random values
     for (int i = 0; i < COLS; i++)
     {
@@ -65,12 +58,21 @@ int main()
         for (int i = 0; i < COLS; i++)
         {
             rainY[i] += rainSpeed[i];
-            if (rainY[i] > 600)
+            if (rainY[i] > GetScreenHeight())
             {
                 rainY[i] = GetRandomValue(-300, 0);
                 rainSpeed[i] = GetRandomValue(2, 8);
             }
         }
+        // UI buttons variables
+        const int btnX = GetScreenWidth() - 50;     // back button position and size
+        const int delbtnX = GetScreenWidth() - 120; // this is for delete button
+        const int crtbtnX = GetScreenWidth() - 190; // this is for the create folder button
+        const int renbtnX = GetScreenWidth() - 260; // this is for the rename button
+        const int btnY = 0;
+        const int btnW = 28;
+        const int btnH = 34;
+
         if (onHomeScreen)
         {
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
@@ -177,7 +179,7 @@ int main()
 
             if (scrollY < 0)
                 scrollY = 0;
-            int maxScroll = (int)files.size() * rowHeight - (600 - listStartY);
+            int maxScroll = (int)files.size() * rowHeight - (GetScreenHeight() - listStartY);
             if (maxScroll < 0)
                 maxScroll = 0;
             if (scrollY > maxScroll)
@@ -250,16 +252,24 @@ int main()
                 {
                     delConfirm = true;
                 }
-                else if (mouseX >= 320 && mouseX <= 360 && mouseY >= 310 && mouseY <= 330)
+                else if (delConfirm)
                 {
-                    deleteFile(currentPath, files[selectedIndex]);
-                    files = listFiles(currentPath);
-                    delConfirm = false;
-                }
-                else if (mouseX >= 520 && mouseX <= 560 && mouseY >= 310 && mouseY <= 330)
-                {
-                    delConfirm = false;
-                }
+                  int popX = GetScreenWidth() / 2 - 200;
+                  int popY = GetScreenHeight() / 2 - 75;
+    
+                  // YES button
+                    if (mouseX >= popX + 70 && mouseX <= popX + 130 && mouseY >= popY + 90 && mouseY <= popY + 120)
+                        {
+                            deleteFile(currentPath, files[selectedIndex]);
+                            files = listFiles(currentPath);
+                            delConfirm = false;
+                        }
+                  // NO button
+                    else if (mouseX >= popX + 270 && mouseX <= popX + 310 && mouseY >= popY + 90 && mouseY <= popY + 120)
+                        {
+                            delConfirm = false;
+                        }
+}
                 else if (mouseX >= crtbtnX && mouseX <= crtbtnX + btnW &&
                          mouseY >= btnY && mouseY <= btnY + btnH)
                 {
@@ -334,7 +344,7 @@ int main()
             }
 
             // this makes the rain effect damper
-            DrawRectangle(0, 35, 770, 600, {0, 0, 0, 160});
+            DrawRectangle(0, 35, GetScreenWidth()-230, GetScreenHeight(), {0, 0, 0, 120});
 
             // current path
             DrawText(currentPath.c_str(), 10, 10, 16, RED);
@@ -354,25 +364,25 @@ int main()
             for (int i = 0; i < (int)files.size(); i++)
             {
                 int y = listStartY + i * rowHeight - scrollY;
-                if (y < listStartY || y > 600)
-                    continue;
+                if (y < listStartY || y > GetScreenHeight())
+                    {continue;}
 
                 if (i == selectedIndex)
                 {
-                    DrawRectangleLines(10, y - 2, 980, rowHeight, ORANGE);
+                    DrawRectangleLines(10, y - 2, GetScreenWidth() - 320, rowHeight, ORANGE);
                     if (isFolder(currentPath, files[i]))
                     {
                         DrawTextureEx(folderIcon, {2, (float)y}, 0, 0.035f, ORANGE);
                     }
                     else
                     {
-                        DrawTextureEx(fileIcon, {4, (float)y}, 0, 0.028f, ORANGE);
+                        DrawTextureEx(fileIcon, {4, (float)y + 2}, 0, 0.028f, ORANGE);
                     }
                     DrawTextEx(uiFont, files[i].c_str(), {(float)20, (float)y}, 24, 1, ORANGE);
                     string size = sizeSorter(fileSize(currentPath, files[i]));
-                    DrawTextEx(uiFont, size.c_str(), {(float)900, (float)y}, 24, 1, RED);
+                    DrawTextEx(uiFont, size.c_str(), {(float)GetScreenWidth() - 400, (float)y}, 24, 1, RED);
                     string type = fileType(files[i]);
-                    DrawTextEx(uiFont, type.c_str(), {(float)775, (float)y}, 24, 1, YELLOW);
+                    DrawTextEx(uiFont, type.c_str(), {(float)GetScreenWidth() - 525, (float)y}, 24, 1, YELLOW);
                 }
                 else
                 {
@@ -382,7 +392,7 @@ int main()
                     }
                     else
                     {
-                        DrawTextureEx(fileIcon, {4, (float)y}, 0, 0.028f, GREEN);
+                        DrawTextureEx(fileIcon, {4, (float)y + 2}, 0, 0.028f, GREEN);
                     }
                     DrawTextEx(uiFont, files[i].c_str(), {(float)20, (float)y}, 22, 1, GREEN);
                 }
@@ -390,24 +400,30 @@ int main()
 
             if (delConfirm)
             {
-                DrawRectangle(250, 200, 400, 150, DARKGRAY);
-                DrawTextEx(uiFont, "Are you sure you want to delete?", {(float)270, (float)230}, 25, 1, WHITE);
-                DrawText("YES", 320, 310, 20, RED);
-                DrawText("NO", 520, 310, 20, GREEN);
+                int popX = GetScreenWidth() / 2 - 200;
+                int popY = GetScreenHeight() / 2 - 75;
+                DrawRectangle(popX, popY, 400, 150, DARKGRAY);
+                DrawTextEx(uiFont, "Are you sure you want to delete?", {(float)popX + 20, (float)popY + 20}, 25, 1, WHITE);
+                DrawText("YES", popX + 70, popY + 100, 20, RED);
+                DrawText("NO", popX + 270, popY + 100, 20, GREEN);
             }
             if (crtConfirm)
             {
-                DrawRectangle(250, 200, 400, 150, DARKGRAY);
-                DrawTextEx(uiFont, "Name your New Folder:", {(float)270, (float)230}, 25, 1, WHITE);
-                DrawTextEx(uiFont, newName.c_str(), {(float)270, (float)270}, 22, 1, GREEN);
-                DrawText("Press ENTER to confirm", 270, 310, 16, GRAY);
+                int popX = GetScreenWidth() / 2 - 200;
+                int popY = GetScreenHeight() / 2 - 75;
+                DrawRectangle(popX, popY, 400, 150, DARKGRAY);
+                DrawTextEx(uiFont, "Name your New Folder:", {(float)popX + 20, (float)popY + 20}, 25, 1, WHITE);
+                DrawTextEx(uiFont, newName.c_str(), {(float)popX + 20, (float)popY + 60}, 22, 1, GREEN);
+                DrawText("Press ENTER to confirm", popX + 20, popY + 110, 16, GRAY);
             }
             if (renConfirm)
             {
-                DrawRectangle(250, 200, 400, 150, DARKGRAY);
-                DrawTextEx(uiFont, "Rename your Item:", {(float)270, (float)230}, 25, 1, WHITE);
-                DrawTextEx(uiFont, newName.c_str(), {(float)270, (float)270}, 22, 1, GREEN);
-                DrawText("Press ENTER to confirm", 270, 310, 16, GRAY);
+                int popX = GetScreenWidth() / 2 - 200;
+                int popY = GetScreenHeight() / 2 - 75;
+                DrawRectangle(popX, popY, 400, 150, DARKGRAY);
+                DrawTextEx(uiFont, "Rename your Item:", {(float)popX + 20, (float)popY + 20}, 25, 1, WHITE);
+                DrawTextEx(uiFont, newName.c_str(), {(float)popX + 20, (float)popY + 60}, 22, 1, GREEN);
+                DrawText("Press ENTER to confirm", popX + 20, popY + 110, 16, GRAY);
             }
 
             EndDrawing();
